@@ -7,12 +7,13 @@ module.exports = async function (context, req) {
     const issues = [];
     let statusCode = 200;
     const urls = req.body.urls;
-    
+
     try {
 
         for (url in urls) {
-            const data = await pa11y(urls[url]);
-            issues.push(`Found ${data.issues.length} issue(s) for ${url}`);
+            const currentUrl = urls[url];
+            const data = await pa11y(currentUrl);
+            issues.push(`Found ${data.issues.length} issue(s) for ${currentUrl}`);
         }
 
     } catch (error) {
