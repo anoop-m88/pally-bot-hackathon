@@ -1,52 +1,30 @@
-const { url } = require('inspector');
+//const { url } = require('inspector');
+const pa11y = require('pa11y');
 
 module.exports = async function (context, req) {
     context.log('JavaScript HTTP trigger function processed a request.');
 
-    const name = (req.query.name || (req.body && req.body.name));
-   
-    var length = name.length;
+    const issues = [];
+    let statusCode = 200;
+    const urls = req.body.urls;
+    
+    try {
 
-    var returnResult = "";
-
-    for(var i =0; i < length; i++)
-    {
-        var testurl = name[i];
-        context.log("url" + testurl);
-        let count = 0;
-        returnResult += testurl + "\r\n";
-
-        try
-        {
-            const pa11y = require('pa11y');   
-            const data = await pa11y(testurl);
-            const issue =  data.issues;
-            count = issue.length;
-            returnResult += "Found " + count + " issue in " + testurl + "\r\n";
-
-           
-
-            for(var j = 0; j < count ; j++)
-            {
-                var x = +j + +1;
-
-                returnResult += "[" + x  + "] "  + issue[i].message + "\r\n";
-            }
-        }
-        catch(error)
-        {
-            context.log('error ' + error);
+        for (url in urls) {
+            const data = await pa11y(urls[url]);
+            issues.push(`Found ${data.issues.length} issue(s) for ${url}`);
         }
 
-        returnResult += "\r\n";
+    } catch (error) {
+        statusCode = 500;
+        context.log('error ' + error);
     }
 
-    context.log('returnResult ' + returnResult);
-
-   const responseMessage = returnResult;
     context.res = {
         // status: 200, /* Defaults to 200 */
-        body: responseMessage
+        status: statusCode,
+        body: issues,
+        "content-type": "application/json"
     };
 
 }
