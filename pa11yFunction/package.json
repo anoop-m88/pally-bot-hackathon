@@ -1,0 +1,14 @@
+{
+  "name": "hackathona11y",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "func start",
+    "test": "echo \"No tests yet...\""
+  },
+  "dependencies": {
+    "pa11y": "^6.0.1",
+    "puppeteer": "^10.4.0"
+  },
+  "devDependencies": {}
+}
