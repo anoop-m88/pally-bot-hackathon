@@ -14,6 +14,12 @@ module.exports = async function (context, req) {
             const currentUrl = urls[url];
             const data = await pa11y(currentUrl);
             issues.push(`Found ${data.issues.length} issue(s) for ${currentUrl}`);
+            var i = 0;
+            for(let x in data.issues)
+            {
+                const issue = data.issues[x];
+                issues.push(`[${++i}] ${issue.message}`);
+            }
         }
 
     } catch (error) {
