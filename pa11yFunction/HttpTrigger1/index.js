@@ -4,7 +4,7 @@ const pa11y = require('pa11y');
 module.exports = async function (context, req) {
     context.log('JavaScript HTTP trigger function processed a request.');
 
-    const issues = [];
+    const violations = [];
     let statusCode = 200;
     const urls = req.body.urls;
 
@@ -13,13 +13,16 @@ module.exports = async function (context, req) {
         for (url in urls) {
             const currentUrl = urls[url];
             const data = await pa11y(currentUrl);
-            issues.push(`Found ${data.issues.length} issue(s) for ${currentUrl}`);
-            var i = 0;
-            for(let x in data.issues)
-            {
-                const issue = data.issues[x];
-                issues.push(`[${++i}] ${issue.message}`);
-            }
+
+            const currentIssues = data.issues.map((issue, index) => {
+                return {
+                    index,
+                    "element": issue.context,
+                    "message": issue.message
+                }
+            });
+
+            violations.push({ url: currentUrl, violations: currentIssues });
         }
 
     } catch (error) {
@@ -30,8 +33,10 @@ module.exports = async function (context, req) {
     context.res = {
         // status: 200, /* Defaults to 200 */
         status: statusCode,
-        body: issues,
-        "content-type": "application/json"
+        body: violations,
+        headers: {
+            "content-type": "application/json"
+        }
     };
 
 }
